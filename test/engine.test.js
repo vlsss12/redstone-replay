@@ -145,3 +145,75 @@ test("unsigned hostile metadata is preserved as untrusted data, not trusted iden
   const data = "0x" + RedstonePayload.prepare(p.signedDataPackages, metadata);
   assert.equal(analyzeCalldata(data).metadata, metadata);
 });
+
+function payloadFromPackages(packages) {
+  return utils.hexConcat([
+    ...packages,
+    utils.hexZeroPad(utils.hexlify(packages.length), 2),
+    "0x000000",
+    "0x000002ed57011e0000",
+  ]);
+}
+test("signed bytes must survive parser round-trip before signer recovery", () => {
+  const p = RedstonePayload.parse(bytes);
+  const one = p.signedDataPackages[0].toBytes();
+  const embeddedNull = one.slice();
+  embeddedNull[1] = 0;
+  // The parser strips this zero and would recover against different bytes.
+  assert.throws(
+    () => analyzeCalldata(payloadFromPackages([embeddedNull])),
+    /cannot preserve exactly/,
+  );
+  const pointA = one.slice(0, 64),
+    pointZ = pointA.slice();
+  pointZ.set(utils.arrayify(utils.formatBytes32String("ZZZ")), 0);
+  const tail = one.slice(64);
+  tail[12] = 2;
+  // The parser also sorts observations; reject unsorted signed data rather than alter it.
+  const unsorted = utils.concat([pointZ, pointA, tail]);
+  assert.throws(
+    () => analyzeCalldata(payloadFromPackages([unsorted])),
+    /cannot preserve exactly/,
+  );
+});
+test("an even-sized median preserves half a raw unit without floating-point loss", () => {
+  const p = RedstonePayload.parse(bytes);
+  const packages = p.signedDataPackages.slice(0, 2).map((pkg, i) => {
+    const b = pkg.toBytes().slice();
+    b.set(utils.arrayify(utils.hexZeroPad(utils.hexlify(100 + i), 32)), 32);
+    return b;
+  });
+  const data = payloadFromPackages(packages);
+  const a = analyzeCalldata(data, { decimals: 0 });
+  const b = analyzeCalldata(data, { decimals: 2 });
+  assert.equal(a.feeds[0].uniqueSigners, 2);
+  assert.equal(a.feeds[0].rawMedian, "100.5");
+  assert.equal(a.feeds[0].displayMedian, "100.5");
+  assert.equal(b.feeds[0].displayMedian, "1.005");
+});
+test("binary unsigned metadata remains byte-exact and is displayed as hex", () => {
+  const p = RedstonePayload.parse(bytes);
+  const data =
+    "0x" +
+    RedstonePayload.prepare(p.signedDataPackages, utils.arrayify("0xff00fe"));
+  assert.equal(analyzeCalldata(data).metadata, "0xff00fe");
+});
+
+test("damaged recent-history items cannot hide valid references or inject extra fields", async () => {
+  const { normalizeRecentReferences } = await import("../src/reference.js");
+  const hash = "0x" + "A".repeat(64);
+  const value = [
+    null,
+    7,
+    { hash, chain: "ethereum", extra: "discard" },
+    { hash: hash.toLowerCase(), chain: "ethereum" },
+    { hash, chain: "base" },
+    { hash, chain: "__proto__" },
+  ];
+  assert.deepEqual(normalizeRecentReferences(value), [
+    { hash: hash.toLowerCase(), chain: "ethereum" },
+    { hash: hash.toLowerCase(), chain: "base" },
+  ]);
+  for (const input of [null, {}, "bad"])
+    assert.deepEqual(normalizeRecentReferences(input), []);
+});

@@ -35,9 +35,9 @@ The frontend is vanilla JavaScript and CSS, bundled by Vite. User-supplied paylo
 
 ## Parsing and aggregation
 
-`analyzeCalldata` checks hex format and a 500 KB input limit, looks for the trailing pull-payload marker, validates physical field boundaries and count limits, then calls `RedstonePayload.parse` from `@redstone-finance/protocol@1.0.0`. It recovers addresses from signatures and extracts timestamps and feed data points.
+`analyzeCalldata` checks hex format and a 500 KB input limit, looks for the trailing pull-payload marker, validates physical field boundaries and count limits, then calls `RedstonePayload.parse` from `@redstone-finance/protocol@1.0.0`. Before recovering any signer, it rebuilds the parsed payload and requires a byte-for-byte match with the original input, including its prefix and unsigned metadata. Encodings changed by parser normalisation or point sorting are rejected rather than used to recover against a different digest. It then recovers addresses from signatures and extracts timestamps and feed data points.
 
-Values are interpreted as unsigned integers. Display scaling is a viewer setting. Observations are grouped by feed and deduplicated case-insensitively by signer for the descriptive median; the first encountered observation for each signer is used. For even counts the raw midpoint is integer-divided before formatting. These choices describe this inspector, not a deployed consumer’s aggregation.
+Values are interpreted as unsigned integers. Display scaling is a viewer setting. Observations are grouped by feed and deduplicated case-insensitively by signer for the descriptive median; the first encountered observation for each signer is used. For even counts the exact average of the two middle values is retained, including a possible half-unit in `rawMedian`. BigInt arithmetic preserves this fraction in display scaling without floating-point rounding. These choices describe this inspector, not a deployed consumer’s aggregation.
 
 Timing compares each package with a reference in whole seconds: a delta from `-60` through `180` is within the default window. No reference means no freshness verdict. The timestamp reference for a retrieved transaction is its block timestamp.
 

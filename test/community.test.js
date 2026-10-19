@@ -128,3 +128,20 @@ test("published explainers and lessons link to primary sources and have coherent
     assert.equal(new URL(l.source).protocol, "https:");
   }
 });
+
+test("shared and edited routes use the same validated canonical preferences", async () => {
+  const { routePath } = await import("../src/community-model.js");
+  assert.equal(
+    routePath({ goal: "contribute", time: 30, interest: "help" }),
+    "/community/?goal=contribute&time=30&interest=help",
+  );
+  assert.equal(
+    routePath({
+      goal: "<script>",
+      time: 999,
+      interest: "__proto__",
+      draft: "private",
+    }),
+    "/community/?goal=new&time=5&interest=learn",
+  );
+});

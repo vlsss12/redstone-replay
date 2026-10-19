@@ -15,6 +15,11 @@ export function normalizePreferences(value = {}) {
     interest: INTERESTS.includes(value.interest) ? value.interest : "learn",
   };
 }
+// One canonical representation for both sharing and updating the current route.
+export function routePath(value) {
+  const p = normalizePreferences(value);
+  return `/community/?${new URLSearchParams({ goal: p.goal, time: String(p.time), interest: p.interest })}`;
+}
 export function normalizeProgress(value = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) value = {};
   return {

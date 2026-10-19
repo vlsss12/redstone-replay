@@ -114,6 +114,8 @@ Useful contributions include a clearer beginner explanation, a source correction
 
 Start with [CONTRIBUTING.md](CONTRIBUTING.md), use the [issue templates](https://github.com/vlsss12/redstone-replay/issues/new/choose), or follow the [community contribution checklist](docs/COMMUNITY_GUIDE.md#make-a-useful-contribution).
 
+[Latest reliability review and known limits →](docs/RELIABILITY_REVIEW.md)
+
 ## Sources and credits
 
 - [Official payload-parsing example](https://github.com/redstone-finance/redstone-evm-examples/blob/main/scripts/parse-redstone-payload.js) — source of the historical AVAX fixture.

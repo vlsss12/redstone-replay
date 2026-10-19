@@ -11,6 +11,7 @@ import {
 } from "./community-data.js";
 import {
   normalizeProgress,
+  routePath,
   normalizePreferences,
   recommendPath,
   recommendTasks,
@@ -262,7 +263,7 @@ function updatePlayground() {
     .join("");
   document.querySelector("#median-explanation").textContent =
     r.spread >= 20
-      ? "One observation is far away. The median still follows the middle value, not the average."
+      ? "These observations are spread apart. The median is still the middle value after sorting, not the average."
       : "These observations are close together. The median is the middle number after sorting.";
   document.querySelector("#age-verdict").innerHTML =
     `<span class="age-tag ${r.fresh ? "fresh" : "old"}">${icon(r.fresh ? "check" : "clock")}${r.fresh ? "Within this demo’s 180-second age rule" : "Too old for this demo’s 180-second age rule"}</span>`;
@@ -352,6 +353,11 @@ document.addEventListener("click", (e) => {
     } else {
       state.preferences = normalizePreferences(choices);
       state.hasPlan = true;
+      history.replaceState(
+        null,
+        "",
+        routePath(state.preferences) + location.hash,
+      );
       save();
       renderPath();
       renderTasks();
@@ -368,6 +374,7 @@ document.addEventListener("click", (e) => {
   if (b.hasAttribute("data-edit-path")) {
     choices = { ...state.preferences };
     state.hasPlan = false;
+    history.replaceState(null, "", location.pathname + location.hash);
     wizardStep = 0;
     save();
     renderPath();
@@ -436,10 +443,7 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (b.hasAttribute("data-share-path")) {
-    const p = state.preferences;
-    copy(
-      `${location.origin}/community/?${new URLSearchParams({ goal: p.goal, time: String(p.time), interest: p.interest })}`,
-    );
+    copy(location.origin + routePath(state.preferences));
     return;
   }
   if (b.dataset.info) {

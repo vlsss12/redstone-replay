@@ -44,3 +44,26 @@ export function parseTransactionReference(input, selectedChain = "ethereum") {
     );
   return { hash: hash.toLowerCase(), chain };
 }
+
+// Browser storage is untrusted; one damaged item must not discard valid history.
+export function normalizeRecentReferences(value) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  return value
+    .filter((item) => {
+      if (
+        !item ||
+        typeof item !== "object" ||
+        typeof item.hash !== "string" ||
+        !/^0x[0-9a-f]{64}$/i.test(item.hash) ||
+        !CHAINS.includes(item.chain)
+      )
+        return false;
+      const key = item.chain + ":" + item.hash.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 4)
+    .map(({ hash, chain }) => ({ hash: hash.toLowerCase(), chain }));
+}

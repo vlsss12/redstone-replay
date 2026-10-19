@@ -5,7 +5,7 @@ import { validatePayloadLayout } from "./payload-layout.js";
 export { parseTransactionReference } from "./reference.js";
 
 export const MARKER = "000002ed57011e0000";
-export const VERSION = "1.0.1";
+export const VERSION = "1.1.1";
 export const SOURCES = {
   parser:
     "https://github.com/redstone-finance/redstone-evm-examples/blob/main/scripts/parse-redstone-payload.js",
@@ -93,9 +93,21 @@ export function analyzeCalldata(input, options = {}) {
     const bytes = utils.arrayify(calldata);
     validatePayloadLayout(bytes);
     parsed = RedstonePayload.parse(bytes);
+    // The parser normalises feed labels and sorts data points when serialising.
+    // Recover signatures only if that representation preserves the actual bytes.
+    const rebuilt = utils.hexConcat([
+      parsed.remainderPrefix,
+      "0x" +
+        RedstonePayload.prepare(
+          parsed.signedDataPackages,
+          parsed.unsignedMetadata,
+        ),
+    ]);
+    if (rebuilt !== calldata.toLowerCase())
+      throw new Error("The parser changed the signed payload bytes.");
   } catch {
     throw new Error(
-      "A RedStone marker is present, but the payload cannot be parsed. It may be truncated, malformed, or use an unsupported encoding.",
+      "A RedStone marker is present, but the payload cannot be parsed. It may be truncated, malformed, or use an encoding the parser cannot preserve exactly.",
     );
   }
   if (
@@ -144,14 +156,12 @@ export function analyzeCalldata(input, options = {}) {
   for (const p of packages)
     for (const dp of p.dataPoints) {
       if (!grouped.has(dp.feedId)) grouped.set(dp.feedId, []);
-      grouped
-        .get(dp.feedId)
-        .push({
-          ...dp,
-          signer: p.signer,
-          timestamp: p.timestamp,
-          packageIndex: p.index,
-        });
+      grouped.get(dp.feedId).push({
+        ...dp,
+        signer: p.signer,
+        timestamp: p.timestamp,
+        packageIndex: p.index,
+      });
     }
   const feeds = [...grouped].map(([id, observations]) => {
     const unique = new Map();
@@ -162,15 +172,21 @@ export function analyzeCalldata(input, options = {}) {
       .map((o) => BigInt(o.rawValue))
       .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
     const mid = Math.floor(values.length / 2);
-    const median =
-      values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2n;
+    const sum =
+      values.length % 2 ? values[mid] * 2n : values[mid - 1] + values[mid];
+    const whole = sum / 2n;
+    const rawMedian = whole.toString() + (sum % 2n ? ".5" : "");
+    const displayMedian =
+      sum % 2n
+        ? utils.formatUnits(sum * 5n, decimals + 1)
+        : utils.formatUnits(whole, decimals);
     return {
       id,
       observations,
       uniqueSigners: unique.size,
       duplicateObservations: observations.length - unique.size,
-      rawMedian: median.toString(),
-      displayMedian: utils.formatUnits(median.toString(), decimals),
+      rawMedian,
+      displayMedian,
     };
   });
   const timestamps = [...new Set(packages.map((p) => p.timestamp))];
