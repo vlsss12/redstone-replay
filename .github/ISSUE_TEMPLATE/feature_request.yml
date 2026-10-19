@@ -1,0 +1,21 @@
+name: Improvement idea
+description: Suggest a focused improvement for community users.
+title: "[Idea] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is difficult today?
+      description: Describe the user and the task, rather than only naming a feature.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Examples, alternatives or relevant sources

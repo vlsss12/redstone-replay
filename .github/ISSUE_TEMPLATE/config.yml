@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community guide
+    url: https://github.com/vlsss12/redstone-replay/blob/main/docs/COMMUNITY_GUIDE.md
+    about: Start here for walkthroughs, report interpretation and troubleshooting.
+  - name: Private vulnerability report
+    url: https://github.com/vlsss12/redstone-replay/security/advisories/new
+    about: Report security issues privately instead of opening a public issue.

@@ -1,0 +1,34 @@
+name: Public transaction example
+description: Suggest an inspectable example that teaches something useful.
+title: "[Example] "
+body:
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network
+      options:
+        - Ethereum
+        - Base
+        - Avalanche
+    validations:
+      required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Public transaction hash or explorer URL
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: What does this example demonstrate?
+      description: Explain what another community member can learn from it.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Confirmed observations and assumptions
+      description: Include decoding results, decimals and their source, if known. Separate payload contents from claims about consumer execution.
+    validations:
+      required: true

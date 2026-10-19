@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a reproducible problem with the inspector or interface.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use public or sanitised data only. For a suspected vulnerability, use the private reporting link in SECURITY.md."
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the input mode, network, public transaction reference or fixture, display decimals and reference time if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the exact error or a screenshot. Remove any sensitive information.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: "Chrome on desktop, Safari on mobile, viewport if known"

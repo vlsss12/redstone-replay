@@ -1,0 +1,36 @@
+{
+  "name": "redstone-replay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test": "node --test test/*.test.js",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@redstone-finance/protocol": "1.0.0",
+    "ethers": "^5.8.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0"
+  },
+  "overrides": {
+    "ws": "^8.21.0"
+  },
+  "description": "A community inspector for RedStone pull payloads: signed observations, recovered signers and readable evidence.",
+  "license": "MIT",
+  "author": "VLS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vlsss12/redstone-replay.git"
+  },
+  "homepage": "https://redstone-replay.vercel.app/",
+  "bugs": {
+    "url": "https://github.com/vlsss12/redstone-replay/issues"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  }
+}
