@@ -1,0 +1,11 @@
+.git/
+.openai/
+.vercel/
+.env*
+!.env.example
+.github/
+docs/
+test/
+*.md
+*.bundle
+*.zip

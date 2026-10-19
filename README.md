@@ -87,7 +87,7 @@ A static-only host can serve the frontend and decode raw calldata, but transacti
 
 ## Privacy
 
-Raw calldata is decoded in your browser. Transaction lookup sends the public hash and network to the site API, which queries fixed public RPC providers. Recent transaction references are kept in localStorage. A transaction share URL contains its public hash and network; raw calldata is not embedded in share URLs. Exported reports contain decoded observations and any retrieved transaction context.
+Raw calldata is decoded in an isolated browser worker with a deadline and cancellation. Transaction lookup sends the public hash and network to the site API, which queries fixed public RPC providers. Recent transaction references are kept in localStorage. A transaction share URL contains its public hash and network; raw calldata is not embedded in share URLs. Exported reports contain decoded observations and any retrieved transaction context.
 
 Hosting and RPC providers may keep routine request logs. Google Fonts is requested for typography. Replay does not ask for wallet connections, transaction signatures or private keys.
 
@@ -104,4 +104,4 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md), use the [issue templates](https:/
 - [Default timing library](https://github.com/redstone-finance/redstone-oracles-monorepo/blob/main/packages/evm-connector/contracts/core/RedstoneDefaultsLib.sol) — default timing semantics.
 - [Official protocol package](https://www.npmjs.com/package/@redstone-finance/protocol/v/1.0.0) — payload parsing and signer recovery.
 
-Independent community software; not an official RedStone product. The project is [MIT licensed](LICENSE). Upstream notices are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Dependency advisory context is documented in [SECURITY.md](SECURITY.md).
+Independent community software; not an official RedStone product. The project is [MIT licensed](LICENSE). Upstream notices are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Dependency advisory context is documented in [SECURITY.md](SECURITY.md). See the [focused review](docs/SECURITY_REVIEW.md) for hardening changes and verification limits.

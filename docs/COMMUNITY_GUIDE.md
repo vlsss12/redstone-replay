@@ -42,7 +42,7 @@ Select **Raw calldata** and paste either an even-length `0x` hexadecimal string 
 }
 ```
 
-The snippet shows the shape only; replace `0x...` with actual calldata. A `data` field is also accepted. Raw bytes are decoded locally in your browser.
+The snippet shows the shape only; replace `0x...` with actual calldata. A `data` field is also accepted. Raw bytes are decoded locally in a browser worker. Inspection accepts up to 500 KB of calldata, 500 packages and 4096 observations; numeric values are limited to 32 bytes. You can cancel an inspection, and decoding stops if its time limit is exceeded.
 
 Open **Display settings** to set display decimals between `0` and `36`. Eight is the default assumption; use the feed’s actual specification when you know it. An optional reference time enables a timing comparison. The date/time input uses your browser’s local time; exported reference timestamps are milliseconds since the Unix epoch.
 
@@ -79,7 +79,7 @@ Unsigned metadata can be informative, but is not authenticated proof of a servic
 
 - **Copy summary** copies the feed summary with its interpretation limits.
 - **Export JSON** downloads the complete decoded report, including its `limitations` and any retrieved chain context.
-- **Share** copies a public transaction URL or the signed-example URL. Arbitrary raw calldata is not placed in a share URL; export its report instead.
+- **Share** copies a public transaction URL or the signed-example URL, preserving the report’s display decimals. Unrelated URL parameters are omitted. Arbitrary raw calldata is not placed in a share URL; export its report instead.
 
 Before posting an export publicly, review its contents. A local report can include data you pasted yourself. A useful report identifies the network, public transaction hash or fixture, decimal setting, reference time and exact question being investigated.
 

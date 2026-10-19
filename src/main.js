@@ -1,3 +1,4 @@
+import { decodePayload } from "./decode.js";
 import { setupGuide } from "./guide.js";
 import "./style.css";
 import {
@@ -42,6 +43,7 @@ let mode = "tx",
   result,
   example = "signed",
   busy = false;
+let inspectionController;
 let recent = [];
 try {
   recent = JSON.parse(localStorage.getItem("replay-recent") || "[]")
@@ -61,13 +63,13 @@ function saveDraft() {
   if (input) drafts[mode] = input.value;
   chosenChain = document.querySelector("#chain")?.value || chosenChain;
   displayDecimals =
-    document.querySelector("#decimals")?.value || displayDecimals;
+    document.querySelector("#decimals")?.value ?? displayDecimals;
   referenceDate =
-    document.querySelector("#reference-time")?.value || referenceDate;
+    document.querySelector("#reference-time")?.value ?? referenceDate;
 }
 function shell() {
   document.querySelector("#app").innerHTML =
-    `<div class="shell"><aside class="sidebar"><a class="brand" href="/">${mark}<div class="brand-name">RedStone<span>REPLAY</span></div></a><div class="side-caption">WORKSPACE</div><nav class="nav"><button class="active" data-action="replay">${icon("search")}Payload inspector</button><button data-action="examples">${icon("layers")}Explore examples</button><button data-action="method">${icon("book")}Methodology</button></nav><div class="side-caption recent-caption">RECENT INSPECTIONS</div><div class="recent-list">${recent.length ? recent.map((r, i) => `<button data-recent="${i}">${esc(r.chain)} · ${short(r.hash)}</button>`).join("") : `<div class="empty-recent">${icon("clock")}<p>Your inspected transactions<br>will appear here.</p></div>`}</div><div class="side-bottom"><div class="side-note"><div class="privacy-icon">${icon("lock")}</div><strong>Explore with confidence.</strong><p>Read-only inspection. Raw calldata is decoded in your browser.</p></div><div class="maker"><span class="maker-avatar">V</span><span>Built by <strong>VLS</strong><small>Independent community project</small></span></div></div></aside><main class="workspace" id="main"><header class="topbar"><div class="crumb"><span class="workspace-icon">${icon("layers")}</span> Workspace <span>/</span> <strong>Payload inspector</strong></div><a class="mobile-brand" href="/">${mark} RedStone Replay</a><div class="top-actions"><a href="${SOURCES.consumer}" target="_blank" rel="noopener">Protocol source ${icon("external")}</a><span class="version"><span></span> Read-only workspace</span></div></header><div class="content"><section class="hero"><div><div class="eyebrow"><span class="red-dot"></span> THE REDSTONE PAYLOAD INSPECTOR</div><h1>From calldata<br>to <em>clarity.</em></h1><p>Unpack the data behind a price. Explore signed observations, timestamps and recovered signers in one clear view.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit-core">${mark}</div><span class="orbit-tag tag-one">${icon("code")} CALLDATA</span><span class="orbit-tag tag-two">${icon("check")} SIGNATURES</span><span class="orbit-tag tag-three">${icon("layers")} OBSERVATIONS</span></div></section><form class="panel entry-card" id="inspect-form"><div class="entry-top"><div class="input-tabs" aria-label="Input type"><button type="button" data-mode="tx" class="${mode === "tx" ? "active" : ""}">${icon("search")}Transaction</button><button type="button" data-mode="raw" class="${mode === "raw" ? "active" : ""}">${icon("code")}Raw calldata</button></div><span class="supported"><span class="network-dot"></span> ETHEREUM / BASE / AVALANCHE</span></div><div class="entry-label"><label for="reference">${mode === "tx" ? "Transaction hash or explorer URL" : "Paste calldata or transaction JSON"}</label>${mode === "tx" ? '<select class="network" id="chain" aria-label="Network"><option value="ethereum">Ethereum</option><option value="base">Base</option><option value="avalanche">Avalanche</option></select>' : ""}</div><div class="${mode === "tx" ? "input-wrap" : "calldata-row"}">${mode === "tx" ? `<div class="input-box">${icon("search")}<input id="reference" required autocomplete="off" spellcheck="false" placeholder="0x… or https://etherscan.io/tx/…" aria-label="Transaction hash or explorer URL"></div>` : '<textarea id="reference" required spellcheck="false" placeholder="0x…" aria-label="Raw calldata"></textarea>'}<button class="primary" type="submit" ${busy ? "disabled" : ""}>Inspect payload${icon("arrow")}</button></div><div class="entry-bottom"><span>${icon("lock")}No wallet connection required. Read-only by design.</span><button type="button" class="text-button" data-action="advanced" aria-label="Display settings" aria-controls="advanced" aria-expanded="false">Display settings</button></div><div class="input-advanced" hidden id="advanced"><label>Display decimals<input id="decimals" type="number" min="0" max="36" value="8" required></label>${mode === "raw" ? '<label>Reference time (optional)<input id="reference-time" type="datetime-local" step="1"></label>' : ""}<p>8 decimals is a display assumption. For transactions, timing is compared with the block timestamp; a consumer can override the default window.</p></div><div id="error" role="alert"></div></form><section class="samples-section" id="examples"><div class="section-label"><h2>Explore an example</h2><span>NO TRANSACTION? START HERE</span></div><div class="sample-grid">${[
+    `<div class="shell"><aside class="sidebar"><a class="brand" href="/">${mark}<div class="brand-name">RedStone<span>REPLAY</span></div></a><div class="side-caption">WORKSPACE</div><nav class="nav"><button class="active" data-action="replay">${icon("search")}Payload inspector</button><button data-action="examples">${icon("layers")}Explore examples</button><button data-action="method">${icon("book")}Methodology</button></nav><div class="side-caption recent-caption">RECENT INSPECTIONS</div><div class="recent-list">${recent.length ? recent.map((r, i) => `<button data-recent="${i}">${esc(r.chain)} · ${short(r.hash)}</button>`).join("") : `<div class="empty-recent">${icon("clock")}<p>Your inspected transactions<br>will appear here.</p></div>`}</div><div class="side-bottom"><div class="side-note"><div class="privacy-icon">${icon("lock")}</div><strong>Explore with confidence.</strong><p>Read-only inspection. Raw calldata is decoded in your browser.</p></div><div class="maker"><span class="maker-avatar">V</span><span>Built by <strong>VLS</strong><small>Independent community project</small></span></div></div></aside><main class="workspace" id="main"><header class="topbar"><div class="crumb"><span class="workspace-icon">${icon("layers")}</span> Workspace <span>/</span> <strong>Payload inspector</strong></div><a class="mobile-brand" href="/">${mark} RedStone Replay</a><div class="top-actions"><a href="${SOURCES.consumer}" target="_blank" rel="noopener">Protocol source ${icon("external")}</a><span class="version"><span></span> Read-only workspace</span></div></header><div class="content"><section class="hero"><div><div class="eyebrow"><span class="red-dot"></span> THE REDSTONE PAYLOAD INSPECTOR</div><h1>From calldata<br>to <em>clarity.</em></h1><p>Unpack the data behind a price. Explore signed observations, timestamps and recovered signers in one clear view.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit-core">${mark}</div><span class="orbit-tag tag-one">${icon("code")} CALLDATA</span><span class="orbit-tag tag-two">${icon("check")} SIGNATURES</span><span class="orbit-tag tag-three">${icon("layers")} OBSERVATIONS</span></div></section><form class="panel entry-card" id="inspect-form" novalidate><div class="entry-top"><div class="input-tabs" aria-label="Input type"><button type="button" data-mode="tx" class="${mode === "tx" ? "active" : ""}">${icon("search")}Transaction</button><button type="button" data-mode="raw" class="${mode === "raw" ? "active" : ""}">${icon("code")}Raw calldata</button></div><span class="supported"><span class="network-dot"></span> ETHEREUM / BASE / AVALANCHE</span></div><div class="entry-label"><label for="reference">${mode === "tx" ? "Transaction hash or explorer URL" : "Paste calldata or transaction JSON"}</label>${mode === "tx" ? '<select class="network" id="chain" aria-label="Network"><option value="ethereum">Ethereum</option><option value="base">Base</option><option value="avalanche">Avalanche</option></select>' : ""}</div><div class="${mode === "tx" ? "input-wrap" : "calldata-row"}">${mode === "tx" ? `<div class="input-box">${icon("search")}<input id="reference" maxlength="2048" required autocomplete="off" spellcheck="false" placeholder="0x… or https://etherscan.io/tx/…" aria-label="Transaction hash or explorer URL"></div>` : '<textarea id="reference" maxlength="1016384" required spellcheck="false" placeholder="0x…" aria-label="Raw calldata"></textarea>'}<button class="primary" type="submit" ${busy ? "disabled" : ""}>Inspect payload${icon("arrow")}</button></div><div class="entry-bottom"><span>${icon("lock")}No wallet connection required. Read-only by design.</span><button type="button" class="text-button" data-action="advanced" aria-label="Display settings" aria-controls="advanced" aria-expanded="false">Display settings</button></div><div class="input-advanced" hidden id="advanced"><label>Display decimals<input id="decimals" type="number" min="0" max="36" value="8" required></label>${mode === "raw" ? '<label>Reference time (optional)<input id="reference-time" type="datetime-local" step="1"></label>' : ""}<p>8 decimals is a display assumption. For transactions, timing is compared with the block timestamp; a consumer can override the default window.</p></div><div id="error" role="alert"></div></form><section class="samples-section" id="examples"><div class="section-label"><h2>Explore an example</h2><span>NO TRANSACTION? START HERE</span></div><div class="sample-grid">${[
       [
         "signed",
         "Signed AVAX payload",
@@ -177,21 +179,42 @@ function showError(e) {
   document.querySelector("#error").innerHTML =
     `<div class="error-message">${esc(e.message || e)}</div>`;
 }
+function readDecimals() {
+  const text = document.querySelector("#decimals").value;
+  const value = Number(text);
+  if (!text.trim() || !Number.isInteger(value) || value < 0 || value > 36)
+    throw new Error("Display decimals must be an integer between 0 and 36.");
+  return value;
+}
+function reportLink() {
+  if (!result?.supported) return null;
+  const q = new URLSearchParams();
+  if (result.context) {
+    q.set("chain", result.context.chain);
+    q.set("tx", result.context.hash);
+  } else if (example === "signed") q.set("example", "signed");
+  else return null;
+  if (result.decimals !== 8) q.set("decimals", String(result.decimals));
+  return `${location.origin}/?${q}`;
+}
 function loadExample(id) {
-  history.replaceState(null, "", `?example=${id}`);
   example = id;
   document.querySelector("#error").innerHTML = "";
   try {
+    const decimals = readDecimals();
     result = analyzeCalldata(
       id === "signed"
         ? fixture.calldata
         : id === "empty"
           ? "0x"
           : "0x000002ed57011e0000",
+      { decimals },
     );
     renderResult();
+    history.replaceState(null, "", reportLink() || `?example=${id}`);
   } catch (e) {
     showError(e);
+    history.replaceState(null, "", location.pathname);
   }
   document
     .querySelectorAll("[data-example]")
@@ -199,20 +222,42 @@ function loadExample(id) {
 }
 async function inspect(reference, chain) {
   if (busy) return;
+  let decimals;
+  try {
+    decimals = readDecimals();
+    if (!reference.trim())
+      throw new Error(
+        "Paste a transaction reference or raw calldata to inspect.",
+      );
+  } catch (e) {
+    showError(e);
+    return;
+  }
   busy = true;
+  example = null;
+  result = null;
+  inspectionController = new AbortController();
+  const controller = inspectionController;
+  const timeout = setTimeout(() => controller.abort(), 28000);
   const btn = document.querySelector("[type=submit]");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Inspecting…';
   document.querySelector("#error").innerHTML = "";
+  const results = document.querySelector("#results");
+  results.setAttribute("aria-busy", "true");
+  results.innerHTML =
+    '<div class="outcome loading"><h3>Inspecting the evidence…</h3><p>Retrieving and decoding the payload. Large inputs are isolated from the page.</p><button class="small-btn" data-action="cancel">Cancel inspection</button></div>';
   try {
-    const decimals = Number(document.querySelector("#decimals").value);
-    example = null;
+    const refTime = document.querySelector("#reference-time")?.value;
     if (mode === "raw") {
-      const ref = document.querySelector("#reference-time").value;
-      result = analyzeCalldata(reference, {
-        decimals,
-        referenceTime: ref ? new Date(ref).getTime() : null,
-      });
+      result = await decodePayload(
+        reference,
+        {
+          decimals,
+          referenceTime: refTime ? new Date(refTime).getTime() : null,
+        },
+        controller.signal,
+      );
       history.replaceState(null, "", location.pathname);
     } else {
       const ref = parseTransactionReference(reference, chain);
@@ -220,15 +265,36 @@ async function inspect(reference, chain) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reference: ref.hash, chain: ref.chain }),
+        signal: controller.signal,
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(
+          "The lookup service returned an unreadable response. Try again or use raw calldata.",
+        );
+      }
       if (!res.ok || data.error)
         throw new Error(data.error || "Lookup failed.");
-      result = analyzeCalldata(data.calldata, {
-        decimals,
-        referenceTime: data.context.blockTimestamp,
-        context: data.context,
-      });
+      if (
+        !data.context ||
+        data.context.hash !== ref.hash ||
+        data.context.chain !== ref.chain ||
+        typeof data.calldata !== "string"
+      )
+        throw new Error(
+          "The lookup service returned incomplete transaction data.",
+        );
+      result = await decodePayload(
+        data.calldata,
+        {
+          decimals,
+          referenceTime: data.context.blockTimestamp,
+          context: data.context,
+        },
+        controller.signal,
+      );
       recent = [
         ref,
         ...recent.filter((x) => x.hash !== ref.hash || x.chain !== ref.chain),
@@ -236,7 +302,9 @@ async function inspect(reference, chain) {
       try {
         localStorage.setItem("replay-recent", JSON.stringify(recent));
       } catch {}
-      history.replaceState(null, "", `?chain=${ref.chain}&tx=${ref.hash}`);
+      const q = new URLSearchParams({ chain: ref.chain, tx: ref.hash });
+      if (decimals !== 8) q.set("decimals", String(decimals));
+      history.replaceState(null, "", `?${q}`);
     }
     renderResult();
     document
@@ -249,9 +317,19 @@ async function inspect(reference, chain) {
       )
       .join("");
   } catch (e) {
-    showError(e);
+    showError(
+      controller.signal.aborted
+        ? new Error(
+            "Inspection cancelled or timed out. You can retry or inspect raw calldata.",
+          )
+        : e,
+    );
+    history.replaceState(null, "", location.pathname);
   } finally {
+    clearTimeout(timeout);
     busy = false;
+    inspectionController = null;
+    results.removeAttribute("aria-busy");
     btn.disabled = false;
     btn.innerHTML = `Inspect payload${icon("arrow")}`;
   }
@@ -267,7 +345,12 @@ document.addEventListener("submit", (e) => {
 });
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
-  if (!b || busy) return;
+  if (!b) return;
+  if (b.dataset.action === "cancel") {
+    inspectionController?.abort();
+    return;
+  }
+  if (busy && !["method", "close"].includes(b.dataset.action)) return;
   if (b.dataset.mode) {
     saveDraft();
     mode = b.dataset.mode;
@@ -282,6 +365,9 @@ document.addEventListener("click", (e) => {
   if (b.dataset.view) {
     technical = b.dataset.view === "technical";
     renderResult();
+    document
+      .querySelector(`[data-view="${b.dataset.view}"]`)
+      .focus({ preventScroll: true });
     return;
   }
   if (b.dataset.address) {
@@ -321,20 +407,18 @@ document.addEventListener("click", (e) => {
       break;
     case "copy":
       copy(
-        `RedStone Replay inspection\n${result.feeds.map((f) => `${f.id}: ${f.displayMedian} (${result.decimals} display decimals), ${f.uniqueSigners} recovered signers`).join("\n")}\nPayload time: ${date(Math.min(...result.timestamps))}\nSigner authorisation and consumer execution are not verified.\n${location.href}`,
+        `RedStone Replay inspection\n${result.feeds.map((f) => `${f.id}: ${f.displayMedian} (${result.decimals} display decimals), ${f.uniqueSigners} recovered signers`).join("\n")}\nPayload time: ${date(Math.min(...result.timestamps))}\nSigner authorisation and consumer execution are not verified.\n${reportLink() || "Local calldata inspection; export the JSON report to share its evidence."}`,
       );
       break;
-    case "share":
-      if (result?.context)
-        copy(
-          `${location.origin}/?chain=${result.context.chain}&tx=${result.context.hash}`,
-        );
-      else if (example === "signed") copy(`${location.origin}/?example=signed`);
+    case "share": {
+      const link = reportLink();
+      if (link) copy(link);
       else
         toast(
           "Raw calldata is private to this browser. Download a report to share it.",
         );
       break;
+    }
     case "download": {
       const url = URL.createObjectURL(
         new Blob(
@@ -361,13 +445,26 @@ document.addEventListener("click", (e) => {
 result = analyzeCalldata(fixture.calldata);
 shell();
 const query = new URLSearchParams(location.search);
-if (["empty", "broken"].includes(query.get("example")))
-  loadExample(query.get("example"));
-if (query.has("tx")) {
-  document.querySelector("#reference").value = query.get("tx");
-  const chain = query.get("chain") || "ethereum";
-  document.querySelector("#chain").value = chain;
-  inspect(query.get("tx"), chain);
+try {
+  if (query.has("decimals")) {
+    document.querySelector("#decimals").value = query.get("decimals");
+    displayDecimals = String(readDecimals());
+  }
+  if (["signed", "empty", "broken"].includes(query.get("example")))
+    loadExample(query.get("example"));
+  if (query.has("tx")) {
+    const ref = parseTransactionReference(
+      query.get("tx"),
+      query.get("chain") || "ethereum",
+    );
+    document.querySelector("#reference").value = ref.hash;
+    document.querySelector("#chain").value = ref.chain;
+    inspect(ref.hash, ref.chain);
+  } else if (!query.has("example") && query.has("decimals"))
+    loadExample("signed");
+} catch (e) {
+  showError(e);
+  history.replaceState(null, "", location.pathname);
 }
 
 setupGuide((action) => {
@@ -376,6 +473,11 @@ setupGuide((action) => {
     return;
   }
   if (action === "results") {
+    if (!result) {
+      toast("Run an inspection or open the AVAX example first.");
+      document.querySelector("#reference").focus();
+      return;
+    }
     document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
     return;
   }
