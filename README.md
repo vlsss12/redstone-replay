@@ -1,17 +1,31 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="RedStone Replay — From calldata to clarity" width="100%">
+<img src="docs/assets/banner.svg" alt="RedStone Replay — Learn, contribute, inspect" width="100%">
 
-**A clearer view of the data behind a price.**
+**A good place to begin. A clearer view when you go deeper.**
 
-Inspect RedStone pull payloads, follow signed observations, and understand what the bytes actually prove.
+Learn the ideas behind RedStone, find a useful way to contribute without writing code, or inspect the signed data behind a transaction.
 
-[**Open the live app ↗**](https://redstone-replay.vercel.app/) · [Community guide](docs/COMMUNITY_GUIDE.md) · [Contribute](CONTRIBUTING.md) · [Report an issue](https://github.com/vlsss12/redstone-replay/issues/new/choose)
+[**Start the Field Guide ↗**](https://redstone-replay.vercel.app/community/) · [Payload inspector](https://redstone-replay.vercel.app/) · [Walkthrough](docs/COMMUNITY_GUIDE.md) · [Contribute](CONTRIBUTING.md) · [Report an issue](https://github.com/vlsss12/redstone-replay/issues/new/choose)
 
 [![Checks](https://github.com/vlsss12/redstone-replay/actions/workflows/ci.yml/badge.svg)](https://github.com/vlsss12/redstone-replay/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-303b4c.svg)](LICENSE)
 
 </div>
+
+## Two ways in
+
+| If you want to… | Start here |
+| --- | --- |
+| Understand RedStone without a technical background | [Field Guide](https://redstone-replay.vercel.app/community/) — a personal 5, 15 or 30-minute route |
+| Learn by trying something | Three short lessons, quick checks and an interactive observation playground |
+| Understand an announcement | Source-linked explainers separating the news, its audience and any action |
+| Contribute without code | Time-matched suggestions and a private, editable draft prepared in your browser |
+| Inspect signed oracle data | [Payload inspector](https://redstone-replay.vercel.app/) — packages, signers, timestamps and evidence boundaries |
+
+![RedStone Field Guide with a personal learning route](docs/assets/field-guide.png)
+
+The Field Guide has a contextual robot helper, a searchable glossary and links to original sources. Progress stays on your device. There is no account, wallet connection or automatic posting, and the checklist does not determine official roles or rewards. See the [Field Guide walkthrough and editorial handbook](docs/FIELD_GUIDE.md).
 
 ## Why Replay exists
 
@@ -87,13 +101,16 @@ A static-only host can serve the frontend and decode raw calldata, but transacti
 
 ## Privacy
 
+The Field Guide stores only route preferences and checked steps in this browser. Contribution notes and editable drafts remain in page memory and disappear on reload. Its reset control clears the guide’s local progress. A shared route includes only goal, time and interest; it does not include completions or draft text.
+
+
 Raw calldata is decoded in an isolated browser worker with a deadline and cancellation. Transaction lookup sends the public hash and network to the site API, which queries fixed public RPC providers. Recent transaction references are kept in localStorage. A transaction share URL contains its public hash and network; raw calldata is not embedded in share URLs. Exported reports contain decoded observations and any retrieved transaction context.
 
 Hosting and RPC providers may keep routine request logs. Google Fonts is requested for typography. Replay does not ask for wallet connections, transaction signatures or private keys.
 
 ## Help the community
 
-Useful contributions include a reproducible public transaction example, a clearer explanation of a confusing result, an accessibility improvement or a focused parser/API test. Include evidence and be precise about what has and has not been verified.
+Useful contributions include a clearer beginner explanation, a source correction, an accessibility observation, a reproducible public transaction example, a clearer explanation of a confusing result, an accessibility improvement or a focused parser/API test. Include evidence and be precise about what has and has not been verified.
 
 Start with [CONTRIBUTING.md](CONTRIBUTING.md), use the [issue templates](https://github.com/vlsss12/redstone-replay/issues/new/choose), or follow the [community contribution checklist](docs/COMMUNITY_GUIDE.md#make-a-useful-contribution).
 

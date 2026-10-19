@@ -45,50 +45,40 @@ const topics = {
     actions: [["method", "Privacy & inspection scope"]],
   },
 };
-export function setupGuide(onAction) {
+const defaultMenu = [
+  ["start", "01", "Start an inspection", "A hash, a link, or raw calldata."],
+  ["example", "02", "Explore the example", "A signed AVAX payload, unpacked."],
+  [
+    "results",
+    "03",
+    "Understand the results",
+    "Observations, signers and timing.",
+  ],
+  ["privacy", "04", "Privacy & scope", "Know what this tool can show."],
+  [
+    "community",
+    "05",
+    "I’m new to RedStone",
+    "A friendly guide, with no coding needed.",
+  ],
+];
+topics.community = {
+  title: "You don’t need to be a builder.",
+  text: "The Field Guide offers a short personal route, a hands-on oracle playground, plain-language news and small contributions you can make without writing code.",
+  actions: [["community", "Open the Field Guide"]],
+};
+export function setupGuide(onAction, config = {}) {
   const host = document.createElement("div");
   host.id = "replay-guide";
   document.body.append(host);
+  const title = config.title || "Replay guide";
+  const definitions = config.topics || topics;
+  const menu = config.menu || defaultMenu;
   let open = false,
     topic = null;
   function render() {
-    const answer = topic ? topics[topic] : null;
-    host.innerHTML = `<section class="guide-panel" ${open ? "" : "hidden"} role="dialog" aria-modal="false" aria-labelledby="guide-title"><header class="guide-header"><span class="guide-avatar">${bot}</span><div><h2 id="guide-title">Replay guide</h2><p>A little help with the bytes.</p></div><button class="guide-close" data-guide="close" aria-label="Close Replay guide">${close}</button></header><div class="guide-content"><span class="guide-eyebrow">YOUR NEXT STEP, MADE CLEAR</span><h3>${answer ? answer.title : "Let’s make sense of the payload."}</h3>${
-      answer
-        ? `<div class="guide-answer" tabindex="-1">${answer.text ? `<p>${answer.text}</p>` : ""}${answer.items ? `<dl>${answer.items.map(([title, text]) => `<div><dt>${title}</dt><dd>${text}</dd></div>`).join("")}</dl>` : ""}<div class="guide-actions">${answer.actions.map(([action, label]) => `<button data-guide-action="${action}">${label}${arrow}</button>`).join("")}</div></div><button class="guide-back" data-guide="back">← All topics</button>`
-        : `<p>Choose what you’d like to do. I’ll point you in the right direction.</p><div class="guide-topics">${[
-            [
-              "start",
-              "01",
-              "Start an inspection",
-              "A hash, a link, or raw calldata.",
-            ],
-            [
-              "example",
-              "02",
-              "Explore the example",
-              "A signed AVAX payload, unpacked.",
-            ],
-            [
-              "results",
-              "03",
-              "Understand the results",
-              "Observations, signers and timing.",
-            ],
-            [
-              "privacy",
-              "04",
-              "Privacy & scope",
-              "Know what this tool can show.",
-            ],
-          ]
-            .map(
-              ([id, n, title, subtitle]) =>
-                `<button data-guide-topic="${id}"><span class="guide-topic-number">${n}</span><span><strong>${title}</strong><small>${subtitle}</small></span>${arrow}</button>`,
-            )
-            .join("")}</div>`
-    }</div><footer class="guide-footer"><span></span>Guided help · No wallet needed</footer></section><button class="guide-launcher ${open ? "is-open" : ""}" data-guide="toggle" aria-expanded="${open}" aria-controls="guide-panel" aria-label="${open ? "Close" : "Open"} Replay guide">${open ? close : bot}<span>${open ? "Close guide" : "Need a hand?"}</span>${open ? "" : "<i></i>"}</button>`;
-    host.querySelector(".guide-panel").id = "guide-panel";
+    const answer = topic ? definitions[topic] : null;
+    host.innerHTML = `<section id="guide-panel" class="guide-panel" ${open ? "" : "hidden"} role="dialog" aria-modal="false" aria-labelledby="guide-title"><header class="guide-header"><span class="guide-avatar">${bot}</span><div><h2 id="guide-title">${title}</h2><p>${config.subtitle || "A little help with the bytes."}</p></div><button class="guide-close" data-guide="close" aria-label="Close ${title}">${close}</button></header><div class="guide-content"><span class="guide-eyebrow">YOUR NEXT STEP, MADE CLEAR</span><h3>${answer ? answer.title : config.introTitle || "Let’s make sense of the payload."}</h3>${answer ? `<div class="guide-answer" tabindex="-1">${answer.text ? `<p>${answer.text}</p>` : ""}${answer.items ? `<dl>${answer.items.map(([title, text]) => `<div><dt>${title}</dt><dd>${text}</dd></div>`).join("")}</dl>` : ""}<div class="guide-actions">${answer.actions.map(([action, label]) => `<button data-guide-action="${action}">${label}${arrow}</button>`).join("")}</div></div><button class="guide-back" data-guide="back">← All topics</button>` : `<p>${config.introText || "Choose what you’d like to do. I’ll point you in the right direction."}</p><div class="guide-topics">${menu.map(([id, n, title, subtitle]) => `<button data-guide-topic="${id}"><span class="guide-topic-number">${n}</span><span><strong>${title}</strong><small>${subtitle}</small></span>${arrow}</button>`).join("")}</div>`}</div><footer class="guide-footer"><span></span>${config.footnote || "Guided help · No wallet needed"}</footer></section><button class="guide-launcher ${open ? "is-open" : ""}" data-guide="toggle" aria-expanded="${open}" aria-controls="guide-panel" aria-label="${open ? "Close" : "Open"} ${title}">${open ? close : bot}<span>${open ? "Close guide" : "Need a hand?"}</span>${open ? "" : "<i></i>"}</button>`;
   }
   host.addEventListener("click", (e) => {
     const b = e.target.closest("button");
@@ -105,17 +95,20 @@ export function setupGuide(onAction) {
       host.querySelector(open ? ".guide-close" : ".guide-launcher").focus();
       return;
     }
-    if (b.dataset.guideTopic) {
+    if (
+      b.dataset.guideTopic &&
+      Object.hasOwn(definitions, b.dataset.guideTopic)
+    ) {
       topic = b.dataset.guideTopic;
       render();
       host.querySelector(".guide-answer").focus();
       return;
     }
     if (b.dataset.guideAction) {
-      const action = b.dataset.guideAction;
       open = false;
       render();
-      onAction(action);
+      host.querySelector(".guide-launcher").focus();
+      onAction(b.dataset.guideAction);
     }
   });
   document.addEventListener("keydown", (e) => {

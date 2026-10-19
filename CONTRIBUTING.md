@@ -10,6 +10,12 @@ Thanks for helping make oracle payloads easier to understand. Small, evidenced i
 
 No coding is required to improve documentation or supply a useful public example.
 
+## Improve the Field Guide without code
+
+Use the [Field Guide](https://redstone-replay.vercel.app/community/) to find a task that fits your time. A useful report can identify one confusing instruction, suggest a clearer explanation or correct a source. Include the section, what you expected and a concrete improvement. Use the **Community guide feedback** issue template after checking that your text is safe to publish.
+
+For content changes, follow the [editorial handbook](docs/FIELD_GUIDE.md#editorial-handbook). Cite the original source, distinguish facts from explanations, and review publication and review dates. Do not promise eligibility, rewards or official endorsement. Translation proposals are welcome for review; the current interface is English.
+
 ## Development workflow
 
 Fork the repository, create a descriptive branch, then run:

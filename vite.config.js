@@ -2,7 +2,12 @@ import { defineConfig } from "vite";
 import replayHandler from "./api/replay.js";
 export default defineConfig({
   server: { port: 4173, strictPort: true },
-  build: { chunkSizeWarningLimit: 650 },
+  build: {
+    chunkSizeWarningLimit: 650,
+    rollupOptions: {
+      input: { replay: "index.html", community: "community/index.html" },
+    },
+  },
   plugins: [
     {
       name: "local-replay-api",

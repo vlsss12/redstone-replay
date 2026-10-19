@@ -1,0 +1,42 @@
+name: Community guide feedback
+description: Make a beginner explanation, source or next step clearer. No coding required.
+title: "[Guide] "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for helping the next newcomer. This is a public issue: leave out private account details and secrets. Use private vulnerability reporting for security issues."
+  - type: dropdown
+    id: section
+    attributes:
+      label: Which part of the guide?
+      options:
+        - My route
+        - Lessons or quick checks
+        - Oracle playground
+        - News explained
+        - Contribution ideas or draft
+        - Glossary
+        - Robot helper
+        - Accessibility or mobile
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: What was confusing or incorrect?
+      description: Tell us what you read or tried and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What would make it clearer?
+      description: A suggested sentence, missing step or original official source is useful.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source or page link
+      description: Optional. Link the relevant page or primary source.

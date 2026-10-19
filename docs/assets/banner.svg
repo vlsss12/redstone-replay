@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc">
-<title id="title">RedStone Replay</title><desc id="desc">From calldata to clarity. An independent community payload inspector by VLS.</desc>
+<title id="title">RedStone Replay</title><desc id="desc">Learn, contribute, inspect. An independent community guide and payload inspector by VLS.</desc>
 <rect width="1280" height="360" rx="20" fill="#171c24"/>
 <g fill="none" stroke="#ed545c" stroke-width="3"><path d="m72 55 23 14-23 14-23-14zm-23 28 23 14 23-14m-46 14 23 14 23-14"/></g>
 <text x="116" y="86" fill="#f7f8fa" font-family="Arial,sans-serif" font-size="24" font-weight="600">RedStone <tspan fill="#9ba5b5" font-weight="400">/ REPLAY</tspan></text>
-<text x="49" y="186" fill="#fff" font-family="Arial,sans-serif" font-size="54" font-weight="600" letter-spacing="-2">From calldata to <tspan fill="#f06b73">clarity.</tspan></text>
-<text x="51" y="230" fill="#a8b1bf" font-family="Arial,sans-serif" font-size="19">Signed observations. Recovered signers. Inspectable evidence.</text>
+<text x="49" y="186" fill="#fff" font-family="Arial,sans-serif" font-size="54" font-weight="600" letter-spacing="-2">A good place to <tspan fill="#f06b73">begin.</tspan></text>
+<text x="51" y="230" fill="#a8b1bf" font-family="Arial,sans-serif" font-size="19">Learn the ideas. Find your contribution. Inspect the evidence.</text>
 <text x="51" y="305" fill="#7f8ca0" font-family="monospace" font-size="12" letter-spacing="2">INDEPENDENT COMMUNITY PROJECT · BUILT BY VLS</text>
 <g transform="translate(1005 178)" fill="none"><circle r="115" stroke="#303846" stroke-dasharray="4 6"/><circle r="82" stroke="#303846"/><rect x="-43" y="-43" width="86" height="86" rx="22" fill="#222a36" stroke="#75414a"/><g stroke="#ed747c" stroke-width="3"><path d="m0-25 26 16L0 7-26-9Zm-26 30L0 37l26-16M-26 6 0 22 26 6"/></g></g>
 </svg>

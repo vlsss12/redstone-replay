@@ -4,6 +4,14 @@
 
 You do not need a wallet or coding experience to explore the example. Start with the bytes, follow the observations, and keep the boundaries of the evidence in view.
 
+## New to RedStone?
+
+Start with the [Field Guide](https://redstone-replay.vercel.app/community/). Choose your goal, available time and interest to get a short learning route. Try a lesson, move the invented observations, read a source-linked announcement and prepare a contribution in your own words. The robot in the lower-right corner can take you to each activity.
+
+[Full Field Guide walkthrough and privacy details →](FIELD_GUIDE.md)
+
+The rest of this page covers the payload inspector when you are ready to explore signed data.
+
 ## 1. Start with the signed example
 
 Open the app and select **Signed AVAX payload** under **Explore an example**. This historical fixture comes from the official RedStone parsing example.

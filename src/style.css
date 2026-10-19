@@ -2595,3 +2595,5 @@ dialog::backdrop {
     padding-bottom: 85px;
   }
 }
+.nav .nav-link{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:8px;font-size:13px;color:#a8b1bf;transition:background .15s,color .15s;text-decoration:none}.nav .nav-link svg{width:18px;height:18px;color:#7b8798}.nav .nav-link:hover{background:#ffffff08;color:#fff}.nav .nav-link.active{background:#e8464e16;box-shadow:inset 0 0 0 1px #ed545c28;color:#ff9298;font-weight:550}.nav .nav-link.active svg{color:#fa777f}.top-actions .community-entry{color:#bc4652;font-weight:500}.nav .replay-link{border-top:1px solid #303743;border-radius:0;margin-top:20px;padding-top:22px;font-size:11px}.nav .replay-link svg:last-child{margin-left:auto;width:12px;height:12px}
+@media(max-width:1000px){.nav .nav-link{font-size:11px;padding:12px 10px;gap:9px}}
